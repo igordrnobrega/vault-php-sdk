@@ -1,9 +1,9 @@
 <?php
 
-namespace Jippi\Vault\Services\Auth;
+namespace IGN\Vault\Services\Auth;
 
 
-use Jippi\Vault\Client;
+use IGN\Vault\Client;
 
 /**
  * This service class handles Vault HTTP API endpoints starting in /auth/approle/

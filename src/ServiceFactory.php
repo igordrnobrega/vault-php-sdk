@@ -1,5 +1,5 @@
 <?php
-namespace Jippi\Vault;
+namespace IGN\Vault;
 
 use GuzzleHttp\Client as GuzzleClient;
 use Psr\Log\LoggerInterface;
@@ -7,11 +7,11 @@ use Psr\Log\LoggerInterface;
 class ServiceFactory
 {
     protected static $services = [
-        'sys' => 'Jippi\Vault\Services\Sys',
-        'data' => 'Jippi\Vault\Services\Data',
-        'auth/token' => 'Jippi\Vault\Services\Auth\Token',
-        'auth/approle'=>'Jippi\Vault\Services\Auth\AppRole',
-        'transit' => 'Jippi\Vault\Services\Transit',
+        'sys' => 'IGN\Vault\Services\Sys',
+        'data' => 'IGN\Vault\Services\Data',
+        'auth/token' => 'IGN\Vault\Services\Auth\Token',
+        'auth/approle'=>'IGN\Vault\Services\Auth\AppRole',
+        'transit' => 'IGN\Vault\Services\Transit',
     ];
 
     protected $client;

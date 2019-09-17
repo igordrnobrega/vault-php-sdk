@@ -1,8 +1,8 @@
 <?php
-namespace Jippi\Vault\Services;
+namespace IGN\Vault\Services;
 
-use Jippi\Vault\Client;
-use Jippi\Vault\OptionsResolver;
+use IGN\Vault\Client;
+use IGN\Vault\OptionsResolver;
 
 /**
  * This service class handle data read/write

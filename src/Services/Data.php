@@ -18,6 +18,13 @@ class Data
     private $client;
 
     /**
+     * Path in Vault
+     *
+     * @var string
+     */
+    private $secretPath;
+
+    /**
      * Create a new Data service with an optional Client
      *
      * @param Client|null $client
@@ -33,21 +40,31 @@ class Data
             'body' => json_encode($body)
         ];
 
-        return $this->client->put('/' . $path, $params);
+        return $this->client->put($this->getSecretPath() . $path, $params);
     }
 
     public function get($path)
     {
-        return $this->client->get('/' . $path);
+        return $this->client->get($this->getSecretPath() . $path);
     }
 
     public function delete($path)
     {
-        return $this->client->delete('/' . $path);
+        return $this->client->delete($this->getSecretPath() . $path);
     }
 
     public function list($path) 
     {
-        return $this->client->list('/' . $path);
+        return $this->client->list($this->getSecretPath() . $path);
+    }
+
+    public function getSecretPath()
+    {
+        return $this->getSecretPath() . $this->secretPath . '/';
+    }
+
+    public function setSecretPath(string $secretPath)
+    {
+        $this->secretPath = $secretPath;
     }
 }

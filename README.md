@@ -6,7 +6,7 @@ Installation
 
 This library can be installed with composer:
 
-    composer require jippi/vault-php-sdk
+    composer require igordrnobrega/vault-php-sdk
 
 Usage
 -----

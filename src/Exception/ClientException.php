@@ -1,5 +1,5 @@
 <?php
-namespace Jippi\Vault\Exception;
+namespace IGN\Vault\Exception;
 
 use RuntimeException;
 

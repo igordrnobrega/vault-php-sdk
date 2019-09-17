@@ -38,6 +38,9 @@ Available services
 
 * sys
 * data
+* transit
+* auth/token
+* auth/approle
 
 License
 -------

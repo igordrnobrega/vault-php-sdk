@@ -97,8 +97,6 @@ class Client
             throw new ServerException($message);
         }
 
-        $this->logger->debug(sprintf("Response:\n%s", (string) $response->getBody()));
-
         if (400 <= $response->getStatusCode()) {
             $message = sprintf('Something went wrong when calling vault (%s - %s).', $response->getStatusCode(), $response->getReasonPhrase());
 
@@ -112,8 +110,6 @@ class Client
 
             throw new ClientException($message, $response->getStatusCode(), $response);
         }
-
-        $response->getBody()->rewind();
 
         return $response;
     }

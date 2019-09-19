@@ -22,7 +22,7 @@ class Data
      *
      * @var string
      */
-    private $secretPath;
+    private static $secretPath;
 
     /**
      * Create a new Data service with an optional Client
@@ -53,18 +53,18 @@ class Data
         return $this->client->delete($this->getSecretPath() . $path);
     }
 
-    public function list($path) 
+    public function list($path)
     {
         return $this->client->list($this->getSecretPath() . $path);
     }
 
     public function getSecretPath()
     {
-        return $this->getSecretPath() . $this->secretPath . '/';
+        return '/' . self::$secretPath . '/';
     }
 
-    public function setSecretPath(string $secretPath)
+    public static function setSecretPath(string $secretPath)
     {
-        $this->secretPath = $secretPath;
+        self::$secretPath = $secretPath;
     }
 }

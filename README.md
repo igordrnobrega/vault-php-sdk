@@ -13,7 +13,7 @@ Usage
 
 The simple way to use this SDK, is to instantiate the service factory:
 
-    $sf = new Jippi\Vault\ServiceFactory();
+    $sf = new IGN\Vault\ServiceFactory();
 
 Then, a service could be retrieved from this factory:
 

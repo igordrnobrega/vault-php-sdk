@@ -2,7 +2,6 @@
 namespace IGN\Vault\Services;
 
 use IGN\Vault\Client;
-use IGN\Vault\OptionsResolver;
 
 /**
  * This service class handle data read/write
@@ -10,6 +9,11 @@ use IGN\Vault\OptionsResolver;
  */
 class Data
 {
+    /**
+     * Specifies the version to return. If not set the latest version is returned.
+     */
+    const LATEST_VERSION = '0';
+
     /**
      * Client instance
      *
@@ -43,9 +47,15 @@ class Data
         return $this->client->put($this->getSecretPath() . $path, $params);
     }
 
-    public function get($path)
+    public function get($path, string $version = self::LATEST_VERSION)
     {
-        return $this->client->get($this->getSecretPath() . $path);
+        $options = [
+            'query' => [
+                'version' => $version
+            ]
+        ];
+
+        return $this->client->get($this->getSecretPath() . $path, $options);
     }
 
     public function delete($path)

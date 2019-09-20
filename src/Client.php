@@ -2,9 +2,13 @@
 namespace IGN\Vault;
 
 use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Request;
 
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Uri;
+use http\Exception\InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -12,6 +16,16 @@ use Psr\Log\NullLogger;
 use IGN\Vault\Exception\ClientException;
 use IGN\Vault\Exception\ServerException;
 
+/**
+ * @method Response get($url, array $options)
+ * @method Response head($url, array $options)
+ * @method Response delete($url, array $options)
+ * @method Response put($url, array $options)
+ * @method Response patch($url, array $options)
+ * @method Response post($url, array $options)
+ * @method Response options($url, array $options)
+ * @method Response list($url, array $options)
+ */
 class Client
 {
     private const VERSION = '/v1';
@@ -42,47 +56,23 @@ class Client
         $this->logger = $logger ?: new NullLogger();
     }
 
-    public function get($url = null, array $options = [])
+    public function __call($name, $arguments)
     {
-        return $this->send(new Request('GET', $this->getUrl($url)), $options);
+        $url = $arguments[0];
+        $options = $arguments[1] ?? [];
+
+        if (!(is_null($url) || is_string($url) || $url instanceof Uri)) {
+            throw new \InvalidArgumentException('First argument must be "null|string|Uri"');
+        }
+
+        if (!is_array($options)) {
+            throw new \InvalidArgumentException('Second argument must be "array"');
+        }
+
+        return $this->send(new Request($name, $this->getUrl($url)), $options);
     }
 
-    public function head($url, array $options = [])
-    {
-        return $this->send(new Request('HEAD', $this->getUrl($url)), $options);
-    }
-
-    public function delete($url, array $options = [])
-    {
-        return $this->send(new Request('DELETE', $this->getUrl($url)), $options);
-    }
-
-    public function put($url, array $options = [])
-    {
-        return $this->send(new Request('PUT', $this->getUrl($url)), $options);
-    }
-
-    public function patch($url, array $options = [])
-    {
-        return $this->send(new Request('PATCH', $this->getUrl($url)), $options);
-    }
-
-    public function post($url, array $options = [])
-    {
-        return $this->send(new Request('POST', $this->getUrl($url)), $options);
-    }
-
-    public function options($url, array $options = [])
-    {
-        return $this->send(new Request('OPTIONS', $this->getUrl($url)), $options);
-    }
-
-    public function list($url, array $options = [])
-    {
-        return $this->send(new Request('LIST', $this->getUrl($url)), $options);
-    }
-
-    public function send(RequestInterface $request, $options = [])
+    public function send(RequestInterface $request, $options = []): Response
     {
         $this->logger->info(sprintf('%s "%s"', $request->getMethod(), $request->getUri()));
         $this->logger->debug(sprintf("Request:\n%s\n%s\n%s", $request->getUri(), $request->getMethod(), json_encode($request->getHeaders())));
@@ -90,13 +80,16 @@ class Client
         try {
             $response = $this->client->send($request, $options);
         } catch (TransferException $e) {
-            $message = sprintf('Something went wrong when calling vault (%s).', $e->getMessage());
-
-            $this->logger->error($message);
-
-            throw new ServerException($message);
+            $this->handleException($e);
         }
 
+        $this->handleResponseErrors($response);
+
+        return $response;
+    }
+
+    private function handleResponseErrors(Response $response)
+    {
         if (400 <= $response->getStatusCode()) {
             $message = sprintf('Something went wrong when calling vault (%s - %s).', $response->getStatusCode(), $response->getReasonPhrase());
 
@@ -110,12 +103,22 @@ class Client
 
             throw new ClientException($message, $response->getStatusCode(), $response);
         }
+    }
 
-        return $response;
+    private function handleException(\Exception $exception)
+    {
+        $message = sprintf('Something went wrong when calling vault (%s).', $e->getMessage());
+        $this->logger->error($message);
+
+        throw new ServerException($message);
     }
 
     private function getUrl($url = null)
     {
+        if ($url instanceof Uri) {
+            return $url;
+        }
+
         return is_null($url) ?: self::VERSION . $url;
     }
 }

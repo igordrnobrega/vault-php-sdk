@@ -106,7 +106,7 @@ class Client
 
     private function handleException(\Exception $exception): void
     {
-        $message = sprintf('Something went wrong when calling vault (%s).', $e->getMessage());
+        $message = sprintf('Something went wrong when calling vault (%s).', $exception->getMessage());
         $this->logger->error($message);
 
         throw new ServerException($message);

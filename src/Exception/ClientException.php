@@ -1,11 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace IGN\Vault\Exception;
 
 use RuntimeException;
 
 class ClientException extends RuntimeException implements VaultExceptionInterface
 {
-
     public $response;
 
     public function __construct($message, $code = null, $response = null)
@@ -18,5 +20,4 @@ class ClientException extends RuntimeException implements VaultExceptionInterfac
     {
         return $this->response;
     }
-
 }

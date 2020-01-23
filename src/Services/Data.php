@@ -1,11 +1,13 @@
 <?php
+
+declare(strict_types=1);
+
 namespace IGN\Vault\Services;
 
 use IGN\Vault\Client;
 
 /**
- * This service class handle data read/write
- *
+ * This service class handle data read/write.
  */
 class Data
 {
@@ -15,23 +17,21 @@ class Data
     const LATEST_VERSION = '0';
 
     /**
-     * Client instance
+     * Client instance.
      *
      * @var Client
      */
     private $client;
 
     /**
-     * Path in Vault
+     * Path in Vault.
      *
      * @var string
      */
     private static $secretPath;
 
     /**
-     * Create a new Data service with an optional Client
-     *
-     * @param Client|null $client
+     * Create a new Data service with an optional Client.
      */
     public function __construct(Client $client = null)
     {
@@ -41,7 +41,7 @@ class Data
     public function write($path, $body)
     {
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         return $this->client->put($this->getSecretPath() . $path, $params);
@@ -51,8 +51,8 @@ class Data
     {
         $options = [
             'query' => [
-                'version' => $version
-            ]
+                'version' => $version,
+            ],
         ];
 
         return $this->client->get($this->getSecretPath() . $path, $options);
@@ -73,7 +73,7 @@ class Data
         return '/' . self::$secretPath . '/';
     }
 
-    public static function setSecretPath(string $secretPath)
+    public static function setSecretPath(string $secretPath): void
     {
         self::$secretPath = $secretPath;
     }

@@ -1,20 +1,19 @@
 <?php
+
+declare(strict_types=1);
+
 namespace IGN\Vault;
 
 use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\TransferException;
 use GuzzleHttp\Psr7\Request;
-
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Uri;
-use http\Exception\InvalidArgumentException;
+use IGN\Vault\Exception\ClientException;
+use IGN\Vault\Exception\ServerException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-
-use IGN\Vault\Exception\ClientException;
-use IGN\Vault\Exception\ServerException;
 
 /**
  * @method Response get($url, array $options)
@@ -39,7 +38,7 @@ class Client
 
         if (isset($options['base_uri'])) {
             $base_uri = $options['base_uri'];
-        } else if (getenv('VAULT_ADDR') !== false) {
+        } elseif (getenv('VAULT_ADDR') !== false) {
             $base_uri = getenv('VAULT_ADDR');
         }
 
@@ -61,7 +60,7 @@ class Client
         $url = $arguments[0];
         $options = $arguments[1] ?? [];
 
-        if (!(is_null($url) || is_string($url) || $url instanceof Uri)) {
+        if (!($url === null || is_string($url) || $url instanceof Uri)) {
             throw new \InvalidArgumentException('First argument must be "null|string|Uri"');
         }
 
@@ -88,16 +87,16 @@ class Client
         return $response;
     }
 
-    private function handleResponseErrors(Response $response)
+    private function handleResponseErrors(Response $response): void
     {
-        if (400 <= $response->getStatusCode()) {
+        if ($response->getStatusCode() >= 400) {
             $message = sprintf('Something went wrong when calling vault (%s - %s).', $response->getStatusCode(), $response->getReasonPhrase());
 
             $this->logger->error($message);
             $this->logger->debug(sprintf("Response:\n%s\n%s\n%s", $response->getStatusCode(), json_encode($response->getHeaders()), $response->getBody()->getContents()));
 
             $message .= "\n" . (string) $response->getBody();
-            if (500 <= $response->getStatusCode()) {
+            if ($response->getStatusCode() >= 500) {
                 throw new ServerException($message, $response->getStatusCode(), $response);
             }
 
@@ -105,9 +104,9 @@ class Client
         }
     }
 
-    private function handleException(\Exception $exception)
+    private function handleException(\Exception $exception): void
     {
-        $message = sprintf('Something went wrong when calling vault (%s).', $e->getMessage());
+        $message = sprintf('Something went wrong when calling vault (%s).', $exception->getMessage());
         $this->logger->error($message);
 
         throw new ServerException($message);
@@ -119,6 +118,6 @@ class Client
             return $url;
         }
 
-        return is_null($url) ?: self::VERSION . $url;
+        return $url === null ?: self::VERSION . $url;
     }
 }

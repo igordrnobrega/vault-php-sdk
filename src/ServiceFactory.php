@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace IGN\Vault;
 
 use GuzzleHttp\Client as GuzzleClient;
@@ -10,13 +13,13 @@ class ServiceFactory
         'sys' => 'IGN\Vault\Services\Sys',
         'data' => 'IGN\Vault\Services\Data',
         'auth/token' => 'IGN\Vault\Services\Auth\Token',
-        'auth/approle'=>'IGN\Vault\Services\Auth\AppRole',
+        'auth/approle' => 'IGN\Vault\Services\Auth\AppRole',
         'transit' => 'IGN\Vault\Services\Transit',
     ];
 
     protected $client;
 
-    public function __construct(array $options = array(), LoggerInterface $logger = null, GuzzleClient $guzzleClient = null)
+    public function __construct(array $options = [], LoggerInterface $logger = null, GuzzleClient $guzzleClient = null)
     {
         $this->client = new Client($options, $logger, $guzzleClient);
     }

@@ -1,26 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace IGN\Vault\Services;
 
 use IGN\Vault\Client;
 use IGN\Vault\OptionsResolver;
 
 /**
- * This service class handle all Vault HTTP API endpoints starting in /transit/
- *
+ * This service class handle all Vault HTTP API endpoints starting in /transit/.
  */
 class Transit
 {
     /**
-     * Client instance
+     * Client instance.
      *
      * @var Client
      */
     private $client;
 
     /**
-     * Create a new Sys service with an optional Client
-     *
-     * @param Client|null $client
+     * Create a new Sys service with an optional Client.
      */
     public function __construct(Client $client = null)
     {
@@ -29,19 +29,19 @@ class Transit
 
     public function getKey($keyName)
     {
-		return $this->client->get('/v1/transit/keys/' . urlencode($keyName));
+        return $this->client->get('/v1/transit/keys/' . urlencode($keyName));
     }
 
     public function createKey($keyName, array $body = [])
     {
-		$body = OptionsResolver::resolve($body, ['type', 'derived', 'convergent_encryption']);
-		$body = OptionsResolver::required($body, ['type']);
+        $body = OptionsResolver::resolve($body, ['type', 'derived', 'convergent_encryption']);
+        $body = OptionsResolver::required($body, ['type']);
 
-		$params = [
-			'body' => json_encode($body)
-		];
+        $params = [
+            'body' => json_encode($body),
+        ];
 
-		return $this->client->put('/transit/keys/' . urlencode($keyName), $params);
+        return $this->client->put('/transit/keys/' . urlencode($keyName), $params);
     }
 
     public function rotateKey($keyName)
@@ -55,10 +55,11 @@ class Transit
         $body['plaintext'] = base64_encode($plainText);
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         $response = $this->client->post('/transit/encrypt/' . urlencode($keyName), $params);
+
         return json_decode($response->getBody(), true)['data']['ciphertext'];
     }
 
@@ -68,10 +69,11 @@ class Transit
         $body['ciphertext'] = $cipherText;
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         $response = $this->client->post('/transit/decrypt/' . urlencode($keyName), $params);
+
         return base64_decode(json_decode($response->getBody(), true)['data']['plaintext']);
     }
 
@@ -81,10 +83,11 @@ class Transit
         $body['ciphertext'] = $cipherText;
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         $response = $this->client->post('/transit/rewrap/' . urlencode($keyName), $params);
+
         return json_decode($response->getBody(), true)['data']['ciphertext'];
     }
 }

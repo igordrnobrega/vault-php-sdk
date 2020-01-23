@@ -1,2 +1,7 @@
 .git
 .idea
+vendor
+bin
+
+### friendsofphp/php-cs-fixer
+.php_cs.cache

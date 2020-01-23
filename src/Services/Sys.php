@@ -1,26 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace IGN\Vault\Services;
 
 use IGN\Vault\Client;
 use IGN\Vault\OptionsResolver;
 
 /**
- * This service class handle all Vault HTTP API endpoints starting in /sys/
- *
+ * This service class handle all Vault HTTP API endpoints starting in /sys/.
  */
 class Sys
 {
     /**
-     * Client instance
+     * Client instance.
      *
      * @var Client
      */
     private $client;
 
     /**
-     * Create a new Sys service with an optional Client
-     *
-     * @param Client|null $client
+     * Create a new Sys service with an optional Client.
      */
     public function __construct(Client $client = null)
     {
@@ -31,7 +31,6 @@ class Sys
      * Return the initialization status of a Vault.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-init.html
-     * @return mixed
      */
     public function status()
     {
@@ -44,7 +43,6 @@ class Sys
      * The Vault must've not been previously initialized
      *
      * @see    https://www.vaultproject.io/docs/http/sys-init.html
-     * @return mixed
      */
     public function init(array $body = [])
     {
@@ -52,7 +50,7 @@ class Sys
         $body = OptionsResolver::required($body, ['secret_shares', 'secret_threshold']);
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         return $this->client->put('/sys/init', $params);
@@ -64,7 +62,6 @@ class Sys
      * This is an unauthenticated endpoint
      *
      * @see    https://www.vaultproject.io/docs/http/sys-seal-status.html
-     * @return mixed
      */
     public function sealStatus()
     {
@@ -81,7 +78,6 @@ class Sys
      * Requires a token with root policy or sudo capability on the path.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-seal.html
-     * @return mixed
      */
     public function seal()
     {
@@ -89,9 +85,9 @@ class Sys
     }
 
     /**
-     * Utility method for checking if the vault is sealed or not
+     * Utility method for checking if the vault is sealed or not.
      *
-     * @return boolean
+     * @return bool
      */
     public function sealed()
     {
@@ -99,9 +95,9 @@ class Sys
     }
 
     /**
-     * Utility method for checking if the vault is unsealed or not
+     * Utility method for checking if the vault is unsealed or not.
      *
-     * @return boolean
+     * @return bool
      */
     public function unsealed()
     {
@@ -118,15 +114,13 @@ class Sys
      * Either the key or reset parameter must be provided; if both are provided, reset takes precedence.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-unseal.html
-     * @param  array  $body
-     * @return mixed
      */
     public function unseal(array $body = [])
     {
         $body = OptionsResolver::resolve($body, ['key', 'reset']);
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         return $this->client->put('/sys/unseal', $params);
@@ -138,7 +132,6 @@ class Sys
      * default_lease_ttl or max_lease_ttl values of 0 mean that the system defaults are used by this backend.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-mounts.html
-     * @return mixed
      */
     public function mounts()
     {
@@ -149,15 +142,13 @@ class Sys
      * Mount a new secret backend to the mount point in the URL.
      *
      * @param  string $name
-     * @param  array  $body
-     * @return mixed
      */
     public function createMount($name, array $body)
     {
         $body = OptionsResolver::resolve($body, ['type', 'description', 'config']);
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         return $this->client->post('/sys/mounts/' . $name, $params);
@@ -167,8 +158,8 @@ class Sys
      * Unmount the mount point specified in the URL.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-mounts.html
+     *
      * @param  string $name
-     * @return mixed
      */
     public function deleteMount($name)
     {
@@ -179,16 +170,16 @@ class Sys
      * Remount an already-mounted backend to a new mount point.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-remount.html
+     *
      * @param  string $from
      * @param  string $to
-     * @return mixed
      */
     public function remount($from, $to)
     {
         $body = compact('from', 'to');
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         return $this->client->post('/sys/remount', $params);
@@ -203,8 +194,6 @@ class Sys
      * which may be the system default or a mount-specific value.
      *
      * @param  string $name
-     * @param  array  $body
-     * @return mixed
      */
     public function tuneMount($name, array $body = [])
     {
@@ -213,17 +202,16 @@ class Sys
         }
 
         $params = [
-            'body' => json_encode(OptionsResolver::resolve($body, ['default_lease_ttl', 'max_lease_ttl']))
+            'body' => json_encode(OptionsResolver::resolve($body, ['default_lease_ttl', 'max_lease_ttl'])),
         ];
 
         return $this->client->post('/sys/mounts/' . $name . '/tune', $params);
     }
 
     /**
-     * Lists all the available policies
+     * Lists all the available policies.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-policy.html
-     * @return mixed
      */
     public function policies()
     {
@@ -234,8 +222,8 @@ class Sys
      * Retrieve the rules for the named policy.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-policy.html
+     *
      * @param  string $name
-     * @return mixed
      */
     public function policy($name)
     {
@@ -248,16 +236,15 @@ class Sys
      * Once a policy is updated, it takes effect immediately to all associated users.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-policy.html
+     *
      * @param  string $name
-     * @param  array  $body
-     * @return mixed
      */
     public function putPolicy($name, array $body)
     {
         $body = OptionsResolver::resolve($body, ['policy']);
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         return $this->client->put('/sys/policy/' . $name, $params);
@@ -269,8 +256,8 @@ class Sys
      * This will immediately affect all associated users
      *
      * @see    https://www.vaultproject.io/docs/http/sys-policy.html
+     *
      * @param  string $name
-     * @return mixed
      */
     public function deletePolicy($name)
     {
@@ -284,14 +271,14 @@ class Sys
      *
      * @see    https://www.vaultproject.io/docs/http/sys-capabilities.html
      * @see    https://www.vaultproject.io/docs/http/sys-capabilities-self.html
+     *
      * @param  string      $path
      * @param  string|null $token
-     * @return mixed
      */
     public function capabilities($path, $token = null)
     {
         $params = [
-            'body' => json_encode(array_filter(compact('token', 'path')))
+            'body' => json_encode(array_filter(compact('token', 'path'))),
         ];
 
         if (empty($token)) {
@@ -302,28 +289,28 @@ class Sys
     }
 
     /**
-     * Renew a secret, requesting to extend the lease
+     * Renew a secret, requesting to extend the lease.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-renew.html
+     *
      * @param  string      $leaseId
      * @param  string|null $increment
-     * @return mixed
      */
     public function renew($leaseId, $increment = null)
     {
         $params = [
-            'body' => json_encode(array_filter(compact('increment')))
+            'body' => json_encode(array_filter(compact('increment'))),
         ];
 
         return $this->client->put('/sys/renew/' . $leaseId, $params);
     }
 
     /**
-     * revoke a secret immediately
+     * revoke a secret immediately.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-revoke.html
+     *
      * @param  string $leaseId
-     * @return mixed
      */
     public function revoke($leaseId)
     {
@@ -331,11 +318,11 @@ class Sys
     }
 
     /**
-     * Revoke all secrets generated under a given prefix immediately
+     * Revoke all secrets generated under a given prefix immediately.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-revoke-prefix.html
+     *
      * @param  string $prefix
-     * @return mixed
      */
     public function revokePrefix($prefix)
     {
@@ -356,8 +343,8 @@ class Sys
      * Access to this endpoint should be tightly controlled.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-revoke-force.html
+     *
      * @param  string $prefix
-     * @return mixed
      */
     public function revokeForce($prefix)
     {
@@ -368,7 +355,6 @@ class Sys
      * Returns the high availability status and current leader instance of Vault.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-leader.html
-     * @return mixed
      */
     public function leader()
     {
@@ -386,7 +372,6 @@ class Sys
      * Requires a token with root policy or sudo capability on the path.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-step-down.html
-     * @return mixed
      */
     public function stepDown()
     {
@@ -397,7 +382,6 @@ class Sys
      * Returns information about the current encryption key used by Vault.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-key-status.html
-     * @return mixed
      */
     public function keyStatus()
     {
@@ -414,7 +398,6 @@ class Sys
      * Future values are encrypted with the new key, while old values are decrypted with previous encryption keys.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-rotate.html
-     * @return mixed
      */
     public function rotate()
     {
@@ -429,9 +412,9 @@ class Sys
      * If `$value` is empty, GET is assumed - otherwise PUT.
      *
      * @see    https://www.vaultproject.io/docs/http/sys-raw.html
+     *
      * @param  string $path
      * @param  string|null $value
-     * @return mixed
      */
     public function raw($path, $value = null)
     {
@@ -440,7 +423,7 @@ class Sys
         }
 
         $params = [
-            'body' => json_encode(compact('value'))
+            'body' => json_encode(compact('value')),
         ];
 
         return $this->client->put('/sys/raw/' . $path, $params);
@@ -452,8 +435,8 @@ class Sys
      * This is the raw path in the storage backend and not the logical path that is exposed via the mount system
      *
      * @see    https://www.vaultproject.io/docs/http/sys-raw.html
+     *
      * @param  string $path
-     * @return mixed
      */
     public function deleteRaw($path)
     {
@@ -464,13 +447,11 @@ class Sys
      * Returns the health status of Vault.
      *
      * This matches the semantics of a Consul HTTP health check and provides a simple way to monitor the health of a Vault instance
-     *
-     * @return mixed
      */
     public function health(array $arguments = [])
     {
         $url = '/sys/health?' . http_build_query($arguments);
+
         return $this->client->get($url);
     }
-
 }

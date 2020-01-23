@@ -1,26 +1,26 @@
 <?php
+
+declare(strict_types=1);
+
 namespace IGN\Vault\Services\Auth;
 
 use IGN\Vault\Client;
 use IGN\Vault\OptionsResolver;
 
 /**
- * This service class handle all Vault HTTP API endpoints starting in /auth/token
- *
+ * This service class handle all Vault HTTP API endpoints starting in /auth/token.
  */
 class Token
 {
     /**
-     * Client instance
+     * Client instance.
      *
      * @var Client
      */
     private $client;
 
     /**
-     * Create a new Sys service with an optional Client
-     *
-     * @param Client|null $client
+     * Create a new Sys service with an optional Client.
      */
     public function __construct(Client $client = null)
     {
@@ -37,18 +37,16 @@ class Token
      * against the specified role name; this may override options set during this call.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  array  $body
-     * @return mixed
      */
     public function create(array $body = [])
     {
         $body = OptionsResolver::resolve($body, [
             'id', 'policies', 'meta', 'no_parent', 'no_default_policy',
-            'renewable', 'ttl', 'explicit_max_ttl', 'display_name', 'num_uses'
+            'renewable', 'ttl', 'explicit_max_ttl', 'display_name', 'num_uses',
         ]);
 
         $params = [
-            'body' => json_encode($body)
+            'body' => json_encode($body),
         ];
 
         return $this->client->post('/auth/token/create', $params)->json();
@@ -58,7 +56,6 @@ class Token
      * Returns information about the current client token.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @return mixed
      */
     public function lookupSelf()
     {
@@ -66,11 +63,11 @@ class Token
     }
 
     /**
-     * Returns information about the client token provided in the request path
+     * Returns information about the client token provided in the request path.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
+     *
      * @param  string $token
-     * @return mixed
      */
     public function lookup($token)
     {
@@ -85,13 +82,12 @@ class Token
      * Token renewal is possible only if there is a lease associated with it.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  array  $body
-     * @return mixed
      */
     public function renewSelf(array $body = [])
     {
         $body = OptionsResolver::resolve($body, ['increment']);
         $params = ['body' => json_encode($body)];
+
         return $this->client->post('/auth/token/renew-self', $params);
     }
 
@@ -103,13 +99,12 @@ class Token
      * Token renewal is possible only if there is a lease associated with it.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  array  $body
-     * @return mixed
      */
     public function renew(array $body = [])
     {
         $body = OptionsResolver::resolve($body, ['token', 'increment']);
         $params = ['body' => json_encode($body)];
+
         return $this->client->post('/auth/token/renew', $params);
     }
 
@@ -119,13 +114,12 @@ class Token
      * When the token is revoked, all secrets generated with it are also revoked.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  array  $body
-     * @return mixed
      */
     public function revoke(array $body = [])
     {
         $body = OptionsResolver::resolve($body, ['token']);
         $params = ['body' => json_encode($body)];
+
         return $this->client->post('/auth/token/revoke', $params);
     }
 
@@ -135,8 +129,6 @@ class Token
      * When the token is revoked, all secrets generated with it are also revoked.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  array  $body
-     * @return mixed
      */
     public function revokeSelf(array $body = [])
     {
@@ -153,8 +145,6 @@ class Token
      * This is a root-protected endpoint.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  array  $body
-     * @return mixed
      */
     public function revokeOrphan(array $body = [])
     {
@@ -165,8 +155,6 @@ class Token
      * Deletes the named role.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  string $role
-     * @return mixed
      */
     public function deleteRole(string $role)
     {
@@ -174,11 +162,9 @@ class Token
     }
 
     /**
-     * Fetches the named role configuration
+     * Fetches the named role configuration.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @param  string $role
-     * @return mixed
      */
     public function getRole(string $role)
     {
@@ -189,7 +175,6 @@ class Token
      * Lists available roles.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @return mixed
      */
     public function listRoles()
     {
@@ -208,13 +193,12 @@ class Token
      * using the sys/revoke-prefix endpoint.
      *
      * @see    https://www.vaultproject.io/docs/auth/token.html
-     * @return mixed
      */
     public function createRole(string $role, array $body = [])
     {
         $body = OptionsResolver::resolve($body, ['allowed_policies', 'orphan', 'period', 'renewable', 'path_suffix', 'explicit_max_ttl']);
         $params = ['body' => json_encode($body)];
+
         return $this->client->post('/auth/token/roles/' . $role, $params);
     }
-
 }
